@@ -1,0 +1,28 @@
+name: Log Sleep and Notify
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  log-and-notify:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    - name: Install dependencies
+      run: pip install pandas twilio
+
+    - name: Run notifier
+      env:
+        EMAIL_USER: ${{ secrets.EMAIL_USER }}
+        EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+        TWILIO_SID: ${{ secrets.TWILIO_SID }}
+        TWILIO_TOKEN: ${{ secrets.TWILIO_TOKEN }}
+      run: python server/notify.py "${{ github.event.issue.body }}"
